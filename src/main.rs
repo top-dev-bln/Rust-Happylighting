@@ -93,6 +93,26 @@ impl Controller {
     Ok(())
 }
 
+    pub async fn set_rgb(&self, r: u8, g: u8, b: u8) -> Result<(), Box<dyn Error>> {
+        let args: [u8; 7] = [
+            86,
+            r,
+            g,
+            b,
+            25,
+            240,
+            170,
+        ];
+        let values: Vec<u8> = args.to_vec();
+
+        self.peripheral
+            .as_ref()
+            .unwrap()
+            .write(&self.char.as_ref().unwrap(), &values, WriteType::WithoutResponse)
+            .await?;
+        Ok(())
+    }
+
 pub async fn disconnect(&self) {
         self.peripheral.as_ref().unwrap().disconnect().await.unwrap();
     }
@@ -136,15 +156,17 @@ async fn main() {
     controller.set_char(char).await;
 
     controller.set_power(true).await.unwrap();
-    sleep(Duration::from_millis(250)).await;
-    controller.set_power(false).await.unwrap();
-    sleep(Duration::from_millis(250)).await;
+    sleep(Duration::from_millis(1000)).await;
+    controller.set_rgb(255, 0, 0).await.unwrap();
+    sleep(Duration::from_millis(1000)).await;
+    controller.set_rgb(100, 0, 0).await.unwrap();
+    sleep(Duration::from_millis(1000)).await;
+    controller.set_rgb(50, 0, 0).await.unwrap();
+    sleep(Duration::from_millis(1000)).await;
+    controller.set_rgb(255, 0, 0).await.unwrap();
+    sleep(Duration::from_millis(1000)).await;
     controller.set_power(true).await.unwrap();
-    sleep(Duration::from_millis(250)).await;
-    controller.set_power(false).await.unwrap();
-    sleep(Duration::from_millis(250)).await;
-    controller.set_power(true).await.unwrap();
-    sleep(Duration::from_millis(250)).await;
+    sleep(Duration::from_millis(1000)).await;
     controller.set_power(false).await.unwrap();
 
     controller.disconnect().await;
